@@ -74,6 +74,10 @@ section '.numbers' executable
     call print_number
     call print_line
 
+    mov rax, 0
+    call print_number
+    call print_line
+
     pop rbx
     pop rax
     ret 
@@ -88,14 +92,14 @@ section '.print_number' executable
     push rdx
     xor rcx, rcx
     .next_iter:
-      cmp rax, 0 
-      je .print_iter
       mov rbx, 10
       xor rdx, rdx
       div rbx
       add rdx, '0'
       push rdx 
       inc rcx
+      cmp rax, 0 
+      je .print_iter
       jmp .next_iter
     .print_iter:
       cmp rcx, 0
@@ -112,7 +116,6 @@ section '.print_number' executable
       ret
 
 section '.print_char' executable ; x64
-
   ; | input:
   ; rax = char
   print_char:
