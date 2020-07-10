@@ -12,6 +12,7 @@ section '.gcd' executable
   ; rax = number
   gcd:
     push rbx
+    push rdx
     .next_iter:
       cmp rbx, 0
       je .close
@@ -22,6 +23,7 @@ section '.gcd' executable
       pop rax
       jmp .next_iter
     .close:
+      pop rdx
       pop rbx
       ret
 
