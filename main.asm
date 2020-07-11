@@ -7,16 +7,14 @@ include "asmlib/sys.inc"
 include "asmlib/str.inc"
 
 section '.data' writable
-  fmt db "[%c + %s + %% + %d]", 0
-  msg db "hello", 0
-  msg2 db "World", 0
+array db 5, 4, 3, 2, 1
+array_size equ 5
 
 section '.text' executable
   _start:
-    push 0x16
-    push msg
-    push 'c'
-    mov rax, fmt
-    call printf
+    mov rax, array
+    mov rbx, array_size
+    call bubble_sort
+    call print_bytes
     call print_line
     call exit
