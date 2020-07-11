@@ -6,6 +6,7 @@ public print_string
 public print_line
 public print_oct
 public print_hex
+public print_bytes
 public printf
 
 include "str.inc"
@@ -261,6 +262,38 @@ section '.printf' executable
       inc rax
       jmp .next_iter
     .close:
+      pop rbx
+      pop rax
+      ret
+
+section '.print_bytes' executable
+  ; | input
+  ; rax = array
+  ; rbx = array size
+  print_bytes:
+    push rax
+    push rbx
+    push rcx
+    mov rcx, rax
+    xor rax, rax
+    mov al, '['
+    call print_char
+    mov al, ' '
+    call print_char
+    .next_iter:
+      cmp rbx, 0
+      je .close
+      mov al, [rcx]
+      call print_number
+      mov al, ' '
+      call print_char
+      inc rcx
+      dec rbx
+      jmp .next_iter 
+    .close:
+      mov al, ']'
+      call print_char
+      pop rcx
       pop rbx
       pop rax
       ret

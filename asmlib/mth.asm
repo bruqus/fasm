@@ -3,6 +3,7 @@ format ELF64
 public gcd
 public fibonacci
 public factorial
+public bubble_sort
 
 section '.gcd' executable
   ; | input
@@ -71,5 +72,49 @@ section '.factorial' executable
       dec rbx
       jmp .next_iter
     .close:
+      pop rbx
+      ret
+
+section '.bubble_sort' executable
+  ; | input
+  ; rax = array
+  ; rbx = array size
+  bubble_sort:
+    push rbx
+    push rcx
+    push rdx
+    xor rcx, rcx ; i
+    .first_iter:
+      cmp rcx, rbx
+      je .break_first
+      xor rdx, rdx ; j
+      push rbx
+      sub rbx, rcx
+      dec rbx
+      .second_iter:
+        cmp rdx, rbx
+        je .break_second
+        push rbx
+        mov bl, [rax+rdx]
+        cmp bl, [rax+rdx+1]
+        jg .swap
+        jmp .pass
+      .swap:
+        push rcx
+        mov cl, [rax+rdx+1]
+        mov [rax+rdx+1], bl
+        mov [rax+rdx], cl
+        pop rcx
+      .pass:
+        pop rbx
+        inc rdx
+        jmp .second_iter
+      .break_second:
+        pop rbx
+        inc rcx
+        jmp .first_iter
+    .break_first:
+      pop rdx
+      pop rcx
       pop rbx
       ret
