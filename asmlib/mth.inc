@@ -2,3 +2,5 @@ extrn gcd
 extrn fibonacci
 extrn factorial
 extrn bubble_sort
+extrn rand
+extrn srand

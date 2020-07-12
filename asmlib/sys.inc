@@ -1,1 +1,2 @@
 extrn exit
+extrn time

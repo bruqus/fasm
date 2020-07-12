@@ -6,3 +6,6 @@ extrn print_oct
 extrn print_hex
 extrn print_bytes
 extrn printf
+extrn input_char
+extrn input_number
+extrn input_string
