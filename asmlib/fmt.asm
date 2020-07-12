@@ -8,11 +8,21 @@ public print_oct
 public print_hex
 public print_bytes
 public printf
+public input_char
+public input_number
+public input_string
 
 include "str.inc"
 
-section '.bss' writable
+
+section '.bss' writeable 
   _bss_char rb 1
+
+  _buffer_char_size equ 2
+  _buffer_char rb _buffer_char_size
+
+  _buffer_number_size equ 21
+  _buffer_number rb _buffer_number_size
 
 section '.print_char' executable
   print_char:
@@ -297,3 +307,52 @@ section '.print_bytes' executable
       pop rbx
       pop rax
       ret
+
+section '.input_char' executable
+  ; | output:
+  ; rax = char
+  input_char:
+    push rbx
+    mov rax, _buffer_char
+    mov rbx, _buffer_char_size
+    call input_string
+    mov rax, [rax]
+    pop rbx
+    ret
+
+section '.input_number' executable
+  ; | output:
+  ; rax = number
+  input_number:
+    push rbx
+    mov rax, _buffer_number
+    mov rbx, _buffer_number_size
+    call input_string
+    call string_to_number
+    pop rbx
+    ret
+
+section '.input_string' executable
+  ; | input:
+  ; rax = buffer
+  ; rbx = buffer size
+  input_string:
+    push rax
+    push rbx
+    push rcx
+    push rdx
+
+    mov rcx, rax
+    mov rdx, rbx
+    mov rax, 3 ; read
+    mov rbx, 2 ; stdin
+    int 0x80
+
+    ; upd
+    mov [rcx+rax-1], byte 0
+
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+    ret

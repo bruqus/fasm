@@ -4,6 +4,11 @@ public gcd
 public fibonacci
 public factorial
 public bubble_sort
+public srand
+public rand
+
+section '.data' writable
+  _next dq 1
 
 section '.gcd' executable
   ; | input
@@ -118,3 +123,31 @@ section '.bubble_sort' executable
       pop rcx
       pop rbx
       ret
+
+section '.rand' executable
+  ; | output:
+  ; rax = number
+  rand:
+    push rbx
+    push rdx
+    mov rax, [_next]
+    mov rbx, 1103515245 * 12345
+    mul rbx
+    mov [_next], rax
+    xor rdx, rdx
+    mov rbx, 65536
+    div rbx
+    xor rdx, rdx
+    mov rbx, 32768
+    div rbx
+    mov rax, rdx
+    pop rdx
+    pop rbx
+    ret
+
+section '.srand' executable
+  ; | input:
+  ; rax = number
+  srand:
+    mov [_next], rax
+    ret
