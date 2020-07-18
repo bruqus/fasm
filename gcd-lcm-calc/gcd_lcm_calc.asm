@@ -4,10 +4,10 @@ public _start
 section '.bss' writable
          byte_for_symb rb 1
 
-         num_buf_length equ 4 
+         num_buf_length equ 4
          num_buffer rb num_buf_length
 
-         array_size equ 10 
+         array_size equ 10
          array rb array_size
 
 section '.data' writable
@@ -23,14 +23,14 @@ section '.data' writable
          youentered_msg db "You entered: ", 0xA, 0
          len_youentered = $ - youentered_msg
 
-         lcm_msg db "Least common multiple of entered numbers ", 0xA, 0 
+         lcm_msg db "Least common multiple of entered numbers ", 0xA, 0
          len_lcm = $ - lcm_msg
 
          gcd_msg db "Greatest common divisor of entered numbers ", 0xA, 0
          len_gcd = $ - gcd_msg
 
 section '.main' executable
-_start: 
+_start:
          mov ecx, enternum_msg
          mov edx, len_enternum
          call print_str
@@ -47,13 +47,12 @@ _start:
          mov eax, 0
 
          mov ecx, gcd_msg
-         mov edx, len_gcd 
+         mov edx, len_gcd
          call print_str
          mov ecx, array
          mov edx, esi
          call gcd_array
          call print_num
-
          call newline
 
          call lcm_array
@@ -62,6 +61,7 @@ _start:
          call print_str
          call print_num
          call newline
+
 .exit:   mov eax, 1
          mov ebx, 0
          int 0x80
@@ -81,7 +81,7 @@ print_array:
          push ecx
          push edx
          mov ecx, space_line
-         mov edx, 2 
+         mov edx, 2
          call print_str
          pop edx
          pop ecx
@@ -96,8 +96,8 @@ section '.newline' executable
 newline:
          push ecx
          push edx
-         mov ecx, enter_line 
-         mov edx, 2 
+         mov ecx, enter_line
+         mov edx, 2
          call print_str
          pop edx
          pop ecx
@@ -113,7 +113,7 @@ gcd_array:
          mov esi, 0
          cmp [ecx], byte 0
          je .end
-         mov al, byte [ecx] 
+         mov al, byte [ecx]
 .loop:   cmp edx, 0
          je .end
          dec edx
@@ -133,12 +133,11 @@ lcm_array:
          push edx
          push ecx
          push esi
-
          dec edx
          mov esi, 0
          cmp [ecx], byte 0
          je .end
-         mov al, byte [ecx] 
+         mov al, byte [ecx]
 .loop:   cmp edx, 0
          je .end
          dec edx
@@ -152,36 +151,36 @@ lcm_array:
          pop ebx
          ret
 
-section '.gcd' executable
-gcd:    
-         push ebx
-         push edx
-.loop:   cmp ebx, 0
-         je .end
-         mov edx, 0
-         div ebx
-         push ebx
-         mov ebx, edx
-         pop eax
-         jmp .loop
-.end:    pop edx
-         pop ebx
-         ret
-
 section '.lcm' executable
 lcm:
          push ebx
          push ecx
          push edx
-
          mov edx, 0
          mov ecx, eax
          imul ecx, ebx
          call gcd
-         xchg eax, ecx 
+         xchg eax, ecx
          div ecx
-
          pop edx
+         pop ecx
+         pop ebx
+         ret
+
+section '.gcd' executable
+gcd:
+         push ebx
+         push ecx
+         push edx
+.loop:   cmp ebx, 0
+         je .end
+         mov edx, 0
+         div ebx
+         mov ecx, ebx
+         mov ebx, edx
+         xchg eax, ecx
+         jmp .loop
+.end:    pop edx
          pop ecx
          pop ebx
          ret
@@ -192,7 +191,7 @@ input_nums:
          mov esi, 0
          mov edi, eax
 .loop1:  cmp ebx, esi
-         je .end
+         je .return
          push ebx
          mov eax, 3 ; read
          mov ebx, 2 ; stdin
@@ -201,13 +200,13 @@ input_nums:
          mov [eax + ecx - 1], byte 0
          cmp [ecx], byte 0
          je .return
-         mov eax, ecx ; else 
+         mov eax, ecx
          push ebx
          push ecx
          push edx
          mov ebx, 0
          mov ecx, 0
-.loop2:  cmp [eax+ebx], byte 0 
+.loop2:  cmp [eax+ebx], byte 0
          je .loop3
          mov cl, [eax+ebx]
          sub cl, ZERO_CODE
@@ -233,8 +232,6 @@ input_nums:
 .return: pop edi
          ret
 
-
-
 section '.print_num' executable
 print_num:
          pushad
@@ -251,21 +248,18 @@ print_num:
 .print:  cmp ecx, 0
          je .end
          pop eax
-
          pushad
          mov [byte_for_symb], al
          mov eax, 4
-         mov ebx, 1 
-         mov ecx, byte_for_symb 
+         mov ebx, 1
+         mov ecx, byte_for_symb
          mov edx, 1
          int 0x80
          popad
          dec ecx
          jmp .print
-
 .end:    popad
          ret
-
 
 section '.print_str' executable
 print_str:
