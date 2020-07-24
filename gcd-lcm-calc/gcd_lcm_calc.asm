@@ -4,8 +4,8 @@ public _start
 section '.bss' writable
          byte_for_symb rb 1
 
-         num_buf_length equ 4
-         num_buffer rb num_buf_length
+         buf_length equ 4
+         buffer rb buf_length
 
          array_size equ 10
          array rb array_size
@@ -16,7 +16,7 @@ section '.data' writable
          enter_line db 0xA, 0
          space_line db 0x20, 0
 
-         end_input equ "To finish typing press 'Enter' twice", 0xA, 0
+         end_input equ "To end input enter an empty character", 0xA, 0
          enternum_msg db "Please enter no more than 10 numbers in the range [0, 255]", 0xA, end_input
          len_enternum = $ - enternum_msg
 
@@ -31,14 +31,15 @@ section '.data' writable
 
 section '.main' executable
 _start:
+         call newline
          mov ecx, enternum_msg
          mov edx, len_enternum
          call print_str
 
          mov eax, array
          mov ebx, array_size
-         mov ecx, num_buffer
-         mov edx, num_buf_length
+         mov ecx, buffer
+         mov edx, buf_length
          call input_nums
 
          mov eax, array
@@ -176,8 +177,8 @@ gcd:
          je .end
          mov edx, 0
          div ebx
-         mov ecx, ebx
-         mov ebx, edx
+         xchg ecx, ebx
+         xchg ebx, edx
          xchg eax, ecx
          jmp .loop
 .end:    pop edx
@@ -193,11 +194,11 @@ input_nums:
 .loop1:  cmp ebx, esi
          je .return
          push ebx
-         mov eax, 3 ; read
-         mov ebx, 2 ; stdin
+         mov eax, 3
+         mov ebx, 2
          int 0x80
          pop ebx
-         mov [eax + ecx - 1], byte 0
+         mov [eax+ecx-1], byte 0
          cmp [ecx], byte 0
          je .return
          mov eax, ecx
@@ -235,19 +236,20 @@ input_nums:
 section '.print_num' executable
 print_num:
          pushad
-         mov ecx, 0
-.loop:   mov edx, 0
-         mov ebx, 10
-         div ebx
+         mov ebx, 0
+.loop:   inc ebx
+         mov ecx, 10
+         mov edx, 0
+         div ecx
          add edx, ZERO_CODE
          push edx
-         inc ecx
          cmp eax, 0
-         je .print
+         je .disp
          jmp .loop
-.print:  cmp ecx, 0
+.disp:   cmp ebx, 0
          je .end
          pop eax
+         dec ebx
          pushad
          mov [byte_for_symb], al
          mov eax, 4
@@ -256,8 +258,7 @@ print_num:
          mov edx, 1
          int 0x80
          popad
-         dec ecx
-         jmp .print
+         jmp .disp
 .end:    popad
          ret
 
